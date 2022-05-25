@@ -1,0 +1,209 @@
+<template>
+  <div class="approve">
+    <!-- 科研项目立项汇总页面 -->
+    <div class="tools">
+      <div>
+        <span>请选择年份进行筛选：</span>
+        <el-select
+          v-model="value"
+          placeholder="请选择年份"
+          @change="searchYear"
+        >
+          <el-option
+            v-for="item in yearOptions"
+            :key="item.yearId"
+            :label="item.yearName"
+            :value="item.yearId"
+          />
+        </el-select>
+      </div>
+      <!-- <div class="tools-btn">
+        <el-input
+          class="search-name"
+          v-model="queryList.searchStr"
+          placeholder="请根据名称查询"
+        ></el-input>
+        <el-button type="success" plain @click="searchList">查询</el-button>
+        <el-button type="success" plain @click="addDialogVisible = true"
+          >添 加</el-button
+        >
+        <el-button type="danger" plain>删 除</el-button>
+      </div> -->
+    </div>
+   
+    <!-- 页面加载的表格 -->
+    <el-card class="data">
+      <el-table :data="tableData" stripe style="width: 100%">
+        <el-table-column type="index" label="序号" align="center" width="80" />
+        <!-- <el-table-column prop="projectTypeName" label="项目类别" /> -->
+        <el-table-column prop="projectTypeName" align="center" label="项目类别" />
+        <el-table-column prop="new_project_funds" align="center"  label="新立项目经费" />
+        <el-table-column prop="number_of_closed_projects" align="center" label="结题项目数" />
+        <el-table-column
+        align="center"
+          prop="number_of_continuation_projects"
+          label="延续项目数"
+        />
+        <el-table-column prop="number_of_new_projects" align="center" label="新立项目数" />
+      </el-table>
+      <el-pagination
+        background
+        layout="total, sizes,prev, pager, next,jumper"
+        :page-size="queryList.rows"
+        :page-sizes="[10, 20, 30]"
+        :current-page.sync="queryList.page"
+        :total="total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+      />
+    </el-card>
+  </div>
+</template>
+
+<script>
+import {
+  getYearListData,
+  attrOrginGetList,
+  GetProjects_StatisticalList,
+} from "@/api/project";
+export default {
+  name: "Comprehensive2",
+  data() {
+    return {
+      total: 0,
+      queryId: null,
+      queryList: {
+        page: 1,
+        rows: 10,
+        yearId: "",
+        searchStr: "",
+      },
+      yearOptions: [], // 年份下拉列表值
+      attrOrginOptions: [], // 单位下拉列表值
+      projectTypeList: [], // 年份下拉列表值
+      projectLevel: [], // 年份下拉列表值
+      value: "",
+      tableData: [],
+      addDialogVisible: false,
+      editDialogVisible: false,
+      // 时间控件的值
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "今天",
+            onClick(picker) {
+              picker.$emit("pick", new Date());
+            },
+          },
+          {
+            text: "昨天",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", date);
+            },
+          },
+          {
+            text: "一周前",
+            onClick(picker) {
+              const date = new Date();
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", date);
+            },
+          },
+        ],
+      },
+    };
+  },
+  mounted() {
+    this.getResearList();
+    this.getYearsListData();
+    this.attrOrginGetList();
+  },
+  methods: {
+    // 获取项目结项列表
+    getResearList() {
+      GetProjects_StatisticalList(this.queryList).then((res) => {
+        this.tableData = res.data.list;
+        this.total = res.data.count;
+        console.log(res);
+      });
+    },
+    // 获取年份加载下拉框
+    getYearsListData() {
+      getYearListData().then((res) => {
+        console.log(res.data);
+        this.yearOptions = res.data;
+      });
+    },
+    // 根据年份筛选数据
+    searchYear(e) {
+      // console.log(e);
+      this.queryList.yearId = e;
+      this.getResearList();
+    },
+    // 获取单位列表下拉框
+    attrOrginGetList() {
+      attrOrginGetList({ page: 1, rows: 100 }).then((res) => {
+        this.attrOrginOptions = res.data.list;
+        console.log(this.attrOrginOptions);
+      });
+    },
+    // 分页器方法
+    handleSizeChange(val) {
+      this.queryList.page = 1;
+      this.queryList.rows = val;
+      this.getResearList();
+    },
+    handleCurrentChange(val) {
+      this.queryList.page = val;
+      this.getResearList();
+    },
+    //条件查询
+    searchList() {
+      this.getResearList();
+    },
+  },
+};
+</script>
+<style scoped lang='scss'>
+.approve {
+  width: 100;
+  .tools {
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    border: 1px solid #dcdfe6;
+  }
+}
+.projectName {
+  text-overflow: -o-ellipsis-lastline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.el-pagination {
+  text-align: center;
+  margin: 20px 0 0 0;
+}
+
+.addForm {
+  display: flex;
+  flex-wrap: wrap;
+  .el-input {
+    width: 240px;
+  }
+}
+.search-name {
+  width: 220px;
+  margin-right: 10px;
+}
+</style>
+<style >
+.el-select .el-input__inner {
+  width: 240px !important;
+}
+</style>
