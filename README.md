@@ -6,6 +6,8 @@
 #### 软件架构
 本项目使用Vue.js开发
 
+
+
 #### 安装教程
 
 1.  git clone https://gitee.com/linvkey/science-project.git
@@ -17,5 +19,4 @@
 如果出现sass等的报错问题
 请运行
 npm install node-sass@npm:dart-sass
-
 
