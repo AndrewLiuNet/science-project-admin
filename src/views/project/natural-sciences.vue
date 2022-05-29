@@ -17,24 +17,23 @@
           />
         </el-select>
       </div>
-      <div style="margin-left: 10px">
-        <!-- <span>请选择年份进行筛选：</span> -->
-        <el-select
-          style="width: 160px"
-          v-model="value"
-          placeholder="请选择年份"
-          @change="searchYear"
-        >
-          <el-option
-            v-for="item in yearOptions"
-            :key="item.yearId"
-            :label="item.yearName"
-            :value="item.yearId"
-          />
-        </el-select>
+        <div style="margin-left: 10px;">
+         <el-date-picker
+          style="width:250px"
+            v-model="timeArea"
+            type="daterange"
+            align="right"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerAreaOptions"
+            @change="changeTime"
+            :append-to-body="false"
+            unlink-panels>
+            </el-date-picker>
       </div>
-      <div class="tools-btn">
         <el-input
+        style="margin-left:10px;"
           class="search-name"
           v-model="queryList.searchStr"
           placeholder="请根据名称查询"
@@ -43,8 +42,6 @@
         <el-button type="success" plain @click="addDialogVisible = true"
           >添 加</el-button
         >
-        <!-- <el-button type="danger" plain>删 除</el-button> -->
-      </div>
       <el-upload
         style="margin-left: 10px"
         class="upload-demo"
@@ -64,7 +61,7 @@
       <!-- 添加模态框 -->
       <el-dialog title="添加" :visible.sync="addDialogVisible" width="50%">
         <el-form
-          ref="ruleForm"
+          ref="addForm"
           :rules="rules"
           :model="addForm"
           label-width="100px"
@@ -113,15 +110,37 @@
             </el-select>
           </el-form-item>
           <el-form-item label="项目名称" prop="project_name">
-            <el-input v-model="addForm.project_name" />
+            <el-input v-model="addForm.project_name" placeholder="请输入项目名称"/>
           </el-form-item>
           <el-form-item label="负责人" prop="person_in_charge">
-            <el-input v-model="addForm.person_in_charge" />
+            <el-input v-model="addForm.person_in_charge"  placeholder="请输入负责人"/>
           </el-form-item>
           <el-form-item label="总经费" prop="total_funds">
-            <el-input v-model="addForm.total_funds" />
+            <el-input v-model="addForm.total_funds" placeholder="请输入总经费"/>
           </el-form-item>
 
+           <el-form-item label="编号" prop="code">
+            <el-input v-model="addForm.code" placeholder="请输入编号"/>
+          </el-form-item>
+          
+           <el-form-item label="是否加密" prop="isEncrypt">
+            <el-select v-model="addForm.isEncrypt"  class="inner-input">
+                <el-option v-for="item in isEncryptOptions" 
+               :key="item.value"
+               :value="item.value"
+               :label="item.label"></el-option>
+                
+             </el-select>
+            </el-form-item>
+          <el-form-item label="项目时间" prop="projectTime">
+             <el-date-picker
+               v-model="addForm.projectTime" 
+                type="datetime"
+                placeholder="选择日期时间"
+                align="right"
+                :picker-options="pickerOptions">
+              </el-date-picker>
+          </el-form-item>
           <el-row>
               <el-col :span="12">
                    <el-form-item
@@ -135,30 +154,18 @@
               </el-col>
 
           </el-row>
-         
-
-           
-       
-
-          <!-- <el-form-item label="立项日期" prop="createTime">
-            <el-date-picker
-              v-model="addForm.createTime"
-              type="datetime"
-              placeholder="选择日期时间"
-              align="right"
-              :picker-options="pickerOptions"
-            />
-          </el-form-item> -->
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button @click="cancel('addForm')">取 消</el-button>
           <el-button type="primary" @click="addFormSub">确 定</el-button>
         </span>
       </el-dialog>
+
+
       <!-- 修改模态框  -->
       <el-dialog title="修改" :visible.sync="editDialogVisible" width="50%">
         <el-form
-          ref="ruleForm"
+          ref="editForm"
           :rules="rules"
           :model="eidtForm"
           label-width="100px"
@@ -207,13 +214,35 @@
             </el-select>
           </el-form-item>
           <el-form-item label="项目名称" prop="project_name">
-            <el-input v-model="eidtForm.project_name" />
+            <el-input v-model="eidtForm.project_name" placeholder="请输入项目名称"/>
           </el-form-item>
           <el-form-item label="负责人" prop="person_in_charge">
-            <el-input v-model="eidtForm.person_in_charge" />
+            <el-input v-model="eidtForm.person_in_charge" placeholder="请输入负责人"/>
           </el-form-item>
           <el-form-item label="总经费" prop="total_funds">
-            <el-input v-model="eidtForm.total_funds" />
+            <el-input v-model="eidtForm.total_funds" placeholder="请输入总经费"/>
+          </el-form-item>
+            <el-form-item label="编号" prop="code">
+            <el-input v-model="eidtForm.code" placeholder="请输入编号"/>
+          </el-form-item>
+          
+           <el-form-item label="是否加密" prop="isEncrypt">
+             <el-select v-model="eidtForm.isEncrypt"    class="inner-input">
+               <el-option v-for="item in isEncryptOptions" 
+                :key="item.value"
+                :value="item.value"
+                :label="item.label"></el-option>
+                
+             </el-select>
+          </el-form-item>
+          <el-form-item label="项目时间" prop="projectTime">
+             <el-date-picker
+               v-model="eidtForm.projectTime" 
+                type="datetime"
+                placeholder="选择日期时间"
+                align="right"
+                :picker-options="pickerOptions">
+              </el-date-picker>
           </el-form-item>
           <el-form-item
             v-if="projectTypeId == '899d1f2f-a39e-11ec-89db-525400a8df07'"
@@ -222,12 +251,15 @@
           >
             <el-input v-model="eidtForm.cooperation_AttrOrgin" />
           </el-form-item>
+
+
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取 消</el-button>
+          <el-button @click="cancel('editForm')">取 消</el-button>
           <el-button type="primary" @click="edtiFormSub">确 定</el-button>
         </span>
       </el-dialog>
+
     </div>
     <!-- 页面加载的表格 -->
     <el-card class="data">
@@ -235,20 +267,13 @@
         <el-table-column type="index" label="序号" width="80" align="center" />
         <el-table-column prop="attrOrginName" label="单位" align="center" />
         <el-table-column prop="project_name" label="项目名称" align="center" />
-        <el-table-column
-          prop="person_in_charge"
-          label="负责人"
-          align="center"
-        />
+        <el-table-column prop="person_in_charge" label="负责人" align="center"/>
         <el-table-column prop="total_funds" label="总经费" align="center" />
-        <el-table-column
-          prop="projectTypeName"
-          label="项目类别"
-          align="center"
-        />
-        <el-table-column
-          v-if="projectTypeId == '899d1f2f-a39e-11ec-89db-525400a8df07'"
-          prop="cooperation_AttrOrgin"
+        <el-table-column prop="projectTypeName" label="项目类别" align="center" />
+        <el-table-column prop="code" label="编号" align="center" />
+        <el-table-column prop="isEncrypt" :formatter="formatIsEncrypt" label="是否加密" align="center" />
+        <el-table-column prop="projectTime" :formatter="formatTime" label="项目时间" align="center" />
+        <el-table-column v-if="projectTypeId == '899d1f2f-a39e-11ec-89db-525400a8df07'" prop="cooperation_AttrOrgin"
           label="合作单位"
           align="center"
         />
@@ -312,7 +337,10 @@ export default {
         yearId: "",
         searchStr: "",
         projectTypeId: "",
+        beginTime:'',
+        endTime:''
       },
+      timeArea:[],
       yearOptions: [], // 年份下拉列表值
       attrOrginOptions: [], // 单位下拉列表值
       projectTypeList: [], //
@@ -340,8 +368,44 @@ export default {
           label: "结题",
         },
       ],
+      isEncryptOptions:[
+          { 
+          value: 1,
+          label: "是",
+          },
+          { 
+          value: 0,
+          label: "否",
+          }],
       eidtForm: {},
       // 时间控件的值
+        pickerAreaOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
       pickerOptions: {
         shortcuts: [
           {
@@ -393,8 +457,22 @@ export default {
             trigger: "blur",
           },
         ],
+         code: [
+          {
+            required: true,
+            message: "请输入项目编号",
+            trigger: "blur",
+          },
+        ],
+        isEncrypt: [
+          {
+            required: true,
+            message: "请选择是否加密",
+            trigger: "blur",
+          },
+        ],
 
-        createTime: [
+        projectTime: [
           { required: true, message: "请选择项目创建时间", trigger: "blur" },
         ],
         cooperation_AttrOrgin: [
@@ -410,11 +488,20 @@ export default {
   },
   mounted() {
     this.getProjectTypeList();
-
     this.getYearsListData();
     this.attrOrginGetList();
   },
   methods: {
+    cancel(formName){
+      console.log(formName)
+      if(formName==='addForm'){
+        this.addDialogVisible=false;
+        this.$refs[formName].resetFields();
+      }else{
+         this.editDialogVisible=false;
+         this.$refs[formName].resetFields();
+      }
+    },
     changeFile(file) {
       let loading = this.$loading({
         lock: true,
@@ -438,6 +525,18 @@ export default {
       loading.close();
       this.isSuccess = true;
     },
+     changeTime(){
+       console.log('变了')
+       if(this.timeArea){
+           this.queryList.beginTime=this.timeArea[0];
+           this.queryList.endTime=this.timeArea[1];
+       }else{
+           this.queryList.beginTime=''
+           this.queryList.endTime=''
+       }
+       
+        this.getResearList();
+      },
     // 获取项目级别列表
     getProjectTypeList() {
       getProjectTypeList().then((res) => {
@@ -491,9 +590,8 @@ export default {
     },
     // 添加项目立项表单
     addFormSub() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs['addForm'].validate((valid) => {
         this.addForm.projectTypeId = this.projectTypeId;
-        console.log(this.addForm);
         if (valid) {
           addResearchProject(this.addForm).then((res) => {
             this.$message.success(res.msg);
@@ -508,29 +606,22 @@ export default {
     },
     // 编辑项目立项表单 前查询
     editRowInfo(row) {
-      console.log(row);
-      //   for (let i = 0; i < this.projectLevel.length; i++) {
-      //     if (row.projectLevelName === this.projectLevel[i].levelName) {
-      //       row.projectLevelId = this.projectLevel[i].levelId;
-      //     }
-      //   }
-      //   for (let i = 0; i < this.projectTypeList.length; i++) {
-      //     if (row.projectTypeName == this.projectTypeList[i].typeName) {
-      //       row.projectTypeId = this.projectTypeList[i].projectTypeId;
-      //     }
-      //   }
       this.eidtForm = { ...row };
       this.editDialogVisible = true;
     },
     // 编辑项目立项表单提交
     edtiFormSub() {
-      editResearchProject(this.eidtForm).then((res) => {
-        console.log(res);
-        // this.getProjectTypeList();
-        this.getResearList();
-        this.$message.success("修改成功！");
-        this.editDialogVisible = false;
-      });
+      this.$refs['editForm'].validate(valid=>{
+          if(valid){
+              editResearchProject(this.eidtForm).then((res) => {
+              this.getResearList();
+              this.$message.success("修改成功！");
+              this.editDialogVisible = false;
+            });
+          }
+      })
+
+    
     },
     // 删除单行数据
     async delRowInfo(id) {
@@ -577,6 +668,12 @@ export default {
       this.getProjectTypeList();
       this.getResearList();
     },
+    formatIsEncrypt(row){
+        return row.isEncrypt===1?'是':'否'
+    },
+    formatTime(row){
+       return  row.projectTime? this.$moment(row.projectTime).format("YYYY-MM-DD HH:mm:ss"):''
+    }
   },
 };
 </script>

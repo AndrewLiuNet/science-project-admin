@@ -1,11 +1,5 @@
 import Vue from "vue";
 import Router from "vue-router";
-import axios from 'axios'
-
-import {
-  attrOrginGetList
-  } from "@/api/project";
-
 
 
 Vue.use(Router);
@@ -38,7 +32,7 @@ import Layout from "@/layout";
  * all roles can be accessed
  */
 
-const department=()=>import("@/views/project/common-sciences");
+
 export const constantRoutes = [
   {
     path: "/login",
@@ -451,86 +445,15 @@ export const constantRoutes = [
       },
     ],
   },
-
-  // 跳转到外部链接
-  // {
-  //   path: 'external-link',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-  //       meta: { title: 'External Link', icon: 'link' }
-  //     }
-  //   ]
-  // },
-
-  // 404 page must be placed at the end !!!
-    // {
-    //   path: "*",
-    //   redirect: "/404",
-    //   hidden: true,
-    // },
 ];
- 
-    //   let attrOrginList=[];
-    //   let icon=[
-    //     "el-icon-rank","el-icon-s-unfold","el-icon-wallet","el-icon-truck","el-icon-collection",
-    //     "el-icon-odometer","el-icon-cpu","el-icon-position","el-icon-data-analysis","el-icon-data-line",
-    //   ]
-    //   let params={
-    //     "page": 1,
-    //     "rows": 100,
-    //     "yearId": "",
-    //     "searchStr": "",
-    //     "attrOrginId": ""
-    //   }
-
-    // async function add(){
-    //   await attrOrginGetList(params).then( res=>{
-    //         attrOrginList=res.data.list;
-    //         for(let p=0;p<attrOrginList.length;p++){
-    //           let iconIndex=p;
-    //           if(iconIndex==attrOrginList.length-1){
-    //             iconIndex=0;
-    //           }else{
-    //             iconIndex++;
-    //           }
-    //           let route={
-    //           path:`/common-science`,
-    //           name:'common-science',
-    //           component: department,
-    //           // id:attrOrginList[p].id,
-    //           meta: {
-    //               title: attrOrginList[p].attrOrginName,
-    //               icon: icon[iconIndex],
-    //             },
-               
-    //           }
-    //             constantRoutes[3].children.push(route)
-    //         }
-    //         sessionStorage.setItem("newRoutes",JSON.stringify(constantRoutes))
-    //       })
-    //     } 
-    //     // {
-    //     //   path: "/common-sciences",
-    //     //   name: "CommonSciences",
-    //     //   component: () => import("@/views/project/common-sciences"),
-    //     //   meta: {
-    //     //     title: "部门信息",  
-    //     //     icon: "el-icon-data-line",
-    //     //   },
-    //     // }
-    //     add();
-       
   const createRouter = () =>
     new Router({
-      mode: "history", // require service support
+      mode: "hash", // require service support
       scrollBehavior: () => ({
         y: 0,
       }),
       routes: constantRoutes,
-    });
-
+  });
   const router = createRouter();
 
 
