@@ -35,8 +35,8 @@ import Layout from "@/layout";
 
 export const constantRoutes = [
   {
-    path: "/login",
-    component: () => import("@/views/login/index"),
+    path: '/login',
+    component: () => import('@/views/login/index'),
     hidden: true,
   },
 
@@ -48,10 +48,10 @@ export const constantRoutes = [
   {
     path: "/",
     component: Layout,
-    redirect: "/dashboard",
+    redirect: "/login",
     children: [
       {
-        path: "dashboard",
+        path: "/dashboard",
         name: "Dashboard",
         component: () => import("@/views/dashboard/index"),
         meta: {
@@ -66,7 +66,7 @@ export const constantRoutes = [
    * 科研项目
    */
    {
-    path: "/project",
+    path: '/project',
     component: Layout,
     meta: {
       title: "科研项目",

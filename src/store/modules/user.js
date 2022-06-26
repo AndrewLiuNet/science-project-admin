@@ -18,9 +18,11 @@ const mutations = {
   },
   SET_TOKEN: (state, token) => {
     state.token = token
+    localStorage.token=token
   },
   SET_NAME: (state, name) => {
     state.name = name
+    localStorage.name=name
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
@@ -44,6 +46,7 @@ const actions = {
       }).catch(error => {
         reject(error)
       })
+      
     })
   },
 

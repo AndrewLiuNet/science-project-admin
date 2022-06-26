@@ -23,6 +23,8 @@
           class="search-name"
           v-model="queryList.searchStr"
           placeholder="请根据名称查询"
+          clearable
+          @clear="getResearList"
         ></el-input>
         <el-button type="success" plain @click="searchList">查询</el-button>
         <el-button type="success" plain @click="addDialogVisible = true"
@@ -49,7 +51,7 @@
     
     <el-dialog title="添加" :visible.sync="addDialogVisible" width="50%">
       <el-form
-        ref="ruleForm"
+        ref="addForm"
         :rules="rules"
         :model="addForm"
         label-width="100px"
@@ -136,7 +138,7 @@
             </el-col>
               <el-col :span="12">
           <el-form-item label="发明人" prop="inventor">
-            <el-input v-model="addForm.inventor" />
+            <el-input v-model="addForm.inventor"  placeholder="请输入发明人"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -144,20 +146,23 @@
       <el-row>
            <el-col :span="12">
             <el-form-item label="专利号" prop="patent_number">
-              <el-input v-model="addForm.patent_number" />
+              <el-input v-model="addForm.patent_number"   placeholder="请输入专利号"/>
             </el-form-item>
             </el-col>
       </el-row>
       </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button @click="cancel('addForm')">取 消</el-button>
           <el-button type="primary" @click="addFormSub">确 定</el-button>
         </span>
     </el-dialog>
+
+
+
     <!-- 修改模态框  -->
     <el-dialog title="修改" :visible.sync="editDialogVisible" width="50%">
       <el-form
-        ref="ruleForm"
+        ref="eidtForm"
         :rules="rules"
         :model="eidtForm"
         label-width="100px"
@@ -246,18 +251,24 @@
                </el-col>  
                   <el-col :span="12">  
           <el-form-item label="发明人" prop="inventor">
-            <el-input v-model="eidtForm.inventor" />
+            <el-input v-model="eidtForm.inventor" placeholder="请输入发明人"/>
           </el-form-item>
             </el-col>  
                  </el-row>
-
-          <el-form-item label="专利号" prop="patent_number">
-            <el-input v-model="eidtForm.patent_number" />
-          </el-form-item>
+          <el-row >
+            <el-col :span="12">
+                <el-form-item style="float:left;" label="专利号" prop="patent_number">
+                  <el-input v-model="eidtForm.patent_number" placeholder="请输入专利号"/>
+                </el-form-item>
+            </el-col>
+        
+    
+          </el-row>
+         
      
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button @click="cancel('eidtForm')">取 消</el-button>
         <el-button type="primary" @click="edtiFormSub">确 定</el-button>
       </span>
     </el-dialog>
@@ -421,6 +432,14 @@ export default {
     this.getResearList();
   },
   methods: {
+      cancel(formName){
+        if(formName==='addForm'){
+            this.addDialogVisible=false;
+        }else{
+              this.editDialogVisible=false;
+        }
+          this.$refs[formName].clearValidate();
+      },
       changeFile(file) {
           let loading = this.$loading({
                 lock: true,
@@ -485,7 +504,7 @@ export default {
     },
     // 添加
     addFormSub() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.addForm.validate((valid) => {
         if (valid) {
           patentAdd(this.addForm).then((res) => {
             this.addForm = {};
@@ -506,12 +525,15 @@ export default {
     },
     // 编辑项目立项表单提交
     edtiFormSub() {
-      patentEdit(this.eidtForm).then((res) => {
-        console.log(res);
-        this.getResearList();
-        this.$message.success("修改成功！");
-        this.editDialogVisible = false;
-      });
+      this.$refs.eidtForm.validate(valid=>{
+        if(!valid) return false;
+        patentEdit(this.eidtForm).then((res) => {
+          this.getResearList();
+          this.$message.success("修改成功！");
+          this.editDialogVisible = false;
+        });
+      })
+     
     },
     // 删除单行数据
     async delRowInfo(id) {
@@ -584,12 +606,20 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding: 0 40px;
-  box-sizing: border-box;
+  // padding: 0 40px;
   .el-input {
     width: 240px;
   }
 }
+// .addForm {
+//   display: flex;
+//   flex-wrap: wrap;
+//   justify-content: space-around;
+//   .el-input {
+//     width: 240px;
+//   }
+// }
+
 .search-name {
   width: 220px;
   margin-right: 10px;

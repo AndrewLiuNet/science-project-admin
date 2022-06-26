@@ -4,7 +4,7 @@
  	<el-container>
 			<div id="info">
         <el-row>
-					<p class="hello">您好！{{name}}</p>	
+					<p class="hello">您好！{{username}}</p>	
 		    </el-row>
 					<p>{{year}}-{{month}}-{{day}}  {{value}}</p>			
 			</div>
@@ -20,7 +20,7 @@ export default {
   name: 'Dashboard',
   data(){
     return{
-      username:'',
+      username:localStorage.name,
       year:'',
       month:'',
       day:'',

@@ -3,26 +3,28 @@
     <!-- 科研项目立项汇总页面 -->
     <div class="tools">
       <div>
-        <span>请选择年份进行筛选：</span>
-        <el-select
-          class="inner-input"
-          v-model="value"
-          placeholder="请选择年份"
-          @change="searchYear"
-        >
-          <el-option
-            v-for="item in yearOptions"
-            :key="item.yearId"
-            :label="item.yearName"
-            :value="item.yearId"
-          />
-        </el-select>
+        <span>请选择时间：</span>
+        <el-date-picker
+           style="width:250px;margin-left:10px;"
+            v-model="timeArea"
+            type="daterange"
+            align="right"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerAreaOptions"
+            @change="changeTime"
+            :append-to-body="false"
+             unlink-panels>
+            </el-date-picker>
       </div>
       <div class="tools-btn">
         <el-input
           class="search-name"
           v-model="queryList.searchStr"
           placeholder="请根据名称查询"
+          clearable
+          @clear="getResearList"
         ></el-input>
         <el-button type="success" plain @click="searchList">查询</el-button>
         <el-button type="success" plain @click="addDialogVisible = true"
@@ -121,7 +123,7 @@
     <!-- 修改模态框  -->
     <el-dialog title="修改" :visible.sync="editDialogVisible" width="50%">
       <el-form
-        ref="ruleForm"
+        ref="eidtForm"
         :rules="rules"
         :model="eidtForm"
         label-width="100px"
@@ -187,7 +189,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button @click="cancel('eidtForm')">取 消</el-button>
         <el-button type="primary" @click="edtiFormSub">确 定</el-button>
       </span>
     </el-dialog>
@@ -251,6 +253,35 @@ export default {
   name: "softwareWorks",
   data() {
     return {
+          // 时间控件的值
+      pickerAreaOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      },
+      timeArea:"",
        isSuccess:false,
       fileList:[],
       tableData: [],
@@ -347,9 +378,26 @@ export default {
     this.getResearList();
   },
   methods: {
-    cancel(form){
-      this.addDialogVisible = false
-        this.$refs.ruleForm.resetFields();
+      changeTime(){
+       if(this.timeArea){
+           this.queryList.beginTime=this.timeArea[0];
+           this.queryList.endTime=this.timeArea[1];
+       }else{
+           this.queryList.beginTime=''
+           this.queryList.endTime=''
+       }
+       
+        this.getResearList();
+      },
+    cancel(formName){
+      if(formName==="ruleForm"){
+          this.addDialogVisible = false
+        
+      }else{
+         this.editDialogVisible=false;
+      }
+       this.$refs[formName].clearValidate();
+        
     },
      changeFile(file) {
        let loading = this.$loading({
@@ -439,12 +487,18 @@ export default {
     },
     // 编辑项目立项表单提交
     edtiFormSub() {
-      softwareCopyrightEdit(this.eidtForm).then((res) => {
-        console.log(res);
-        this.getResearList();
-        this.$message.success("修改成功！");
-        this.editDialogVisible = false;
-      });
+      this.$refs.eidtForm.validate(valid=>{
+        if(valid){
+              softwareCopyrightEdit(this.eidtForm).then((res) => {
+              this.getResearList();
+              this.$message.success("修改成功！");
+              this.editDialogVisible = false;
+            });
+        }else{
+          return false
+        }
+      })
+    
     },
     // 删除单行数据
     async delRowInfo(id) {

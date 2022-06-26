@@ -3,25 +3,28 @@
     <!-- 科研项目立项汇总页面 -->
     <div class="tools">
       <div>
-        <span>请选择年份进行筛选：</span>
-        <el-select
-          v-model="value"
-          placeholder="请选择年份"
-          @change="searchYear"
-        >
-          <el-option
-            v-for="item in yearOptions"
-            :key="item.yearId"
-            :label="item.yearName"
-            :value="item.yearId"
-          />
-        </el-select>
+        <span>请选择时间：</span>
+         <el-date-picker
+           style="width:250px;margin-left:10px;"
+            v-model="timeArea"
+            type="daterange"
+            align="right"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerAreaOptions"
+            @change="changeTime"
+            :append-to-body="false"
+             unlink-panels>
+            </el-date-picker>
       </div>
       <div class="tools-btn">
         <el-input
           class="search-name"
           v-model="queryList.searchStr"
           placeholder="请根据名称查询"
+          clearable
+          @clear="getResearList"
         ></el-input>
         <el-button type="success" plain @click="searchList">查询</el-button>
         <el-button type="success" plain @click="addDialogVisible = true"
@@ -34,7 +37,7 @@
       <!-- 添加模态框 -->
       <el-dialog title="添加" :visible.sync="addDialogVisible" width="50%">
         <el-form
-          ref="ruleForm"
+          ref="addForm"
           :rules="rules"
           :model="addForm"
           label-width="100px"
@@ -82,13 +85,13 @@
           <el-form-item label="收录情况" prop="collection">
             <el-input v-model="addForm.collection" placeholder="请输入收录情况"/>
           </el-form-item>
-          <el-form-item label="论文编号" prop="code">
+          <!-- <el-form-item label="论文编号" prop="code">
             <el-input v-model="addForm.code" placeholder="请输入论文编号"/>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
         <span slot="footer" class="dialog-footer">
              <!-- ('ruleForm') -->
-          <el-button @click="resetForm">取 消</el-button>
+          <el-button @click="cancel('addForm')">取 消</el-button>
           <el-button type="primary" @click="addFormSub">确 定</el-button>
         </span>
       </el-dialog>
@@ -97,7 +100,7 @@
       <!-- 修改模态框  -->
       <el-dialog title="修改" :visible.sync="editDialogVisible" width="50%">
         <el-form
-          ref="ruleForm"
+          ref="eidtForm"
           :rules="rules"
           :model="eidtForm"
           label-width="100px"
@@ -145,13 +148,13 @@
           <el-form-item label="收录情况" prop="collection">
             <el-input v-model="eidtForm.collection" />
           </el-form-item>
-           <el-form-item label="论文编号" prop="code">
+           <!-- <el-form-item label="论文编号" prop="code">
             <el-input v-model="eidtForm.code" placeholder="请输入论文编号"/>
-          </el-form-item>
+          </el-form-item> -->
         </el-form>
         <span slot="footer" class="dialog-footer">
        
-          <el-button @click="resetForm">取 消</el-button>
+          <el-button @click="cancel('eidtForm')">取 消</el-button>
           <el-button type="primary" @click="edtiFormSub">确 定</el-button>
         </span>
       </el-dialog>
@@ -166,7 +169,7 @@
         <el-table-column prop="publication" label="发表刊物" align="center"/>
         <el-table-column prop="publication_time" label="发表时间" align="center"/>
         <el-table-column prop="collection" label="收录情况" align="center"/>
-          <el-table-column prop="code" label="论文编号" align="center"/>
+          <!-- <el-table-column prop="code" label="论文编号" align="center"/> -->
     
         <el-table-column width="220" label="操作">
           <template slot-scope="scope">
@@ -208,6 +211,35 @@ export default {
   name: "AcademicPaper",
   data() {
     return {
+        // 时间控件的值
+        pickerAreaOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
+      timeArea:"",
       total: 0,
       queryId: null,
       pageSize:'',
@@ -217,6 +249,8 @@ export default {
         rows: 10,
         yearId: "",
         recognized_kernel_journals: "",
+        beginTime:"",
+        endTime:""
       },
       yearOptions: [], // 年份下拉列表值
       attrOrginOptions: [], // 单位下拉列表值
@@ -301,7 +335,18 @@ export default {
     this.attrOrginGetList();
   },
   methods: {
-    
+     changeTime(){
+       if(this.timeArea){
+           this.queryList.beginTime=this.timeArea[0];
+           this.queryList.endTime=this.timeArea[1];
+       }else{
+           this.queryList.beginTime=''
+           this.queryList.endTime=''
+       }
+       
+        this.getResearList();
+      },
+      
     // 获取项目结项列表
     getResearList() {
       getAcademicPaper(this.queryList).then((res) => {
@@ -337,7 +382,7 @@ export default {
     // 添加
     addFormSub() {
       console.log(this.addForm);
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.addForm.validate((valid) => {
         if (valid) {
           academicPaperAdd(this.addForm).then((res) => {
             // console.log(res);
@@ -351,11 +396,19 @@ export default {
         }
       });
     },
-    resetForm(){
-      this.addDialogVisible = false;
-      this.editDialogVisible=false;
-       this.$refs.ruleForm.resetFields();
+    cancel(formName){
+      if(formName==='addForm'){
+        this.addDialogVisible=false;
+      }else{
+        this.editDialogVisible=false
+      }
+      this.$refs[formName].clearValidate();
     },
+    // resetForm(){
+    //   this.addDialogVisible = false;
+    //   this.editDialogVisible=false;
+    //    this.$refs.ruleForm.resetFields();
+    // },
     // 编辑项目立项表单 前查询
     editRowInfo(row) {
       console.log(row);
@@ -364,10 +417,9 @@ export default {
     },
     // 编辑项目立项表单提交
     edtiFormSub() {
-       this.$refs.ruleForm.validate((valid) => {
+       this.$refs.eidtForm.validate((valid) => {
          if(valid){
                academicPaperEdit(this.eidtForm).then((res) => {
-              console.log(res);
               this.getResearList();
               this.$message.success("修改成功！");
               this.editDialogVisible = false;

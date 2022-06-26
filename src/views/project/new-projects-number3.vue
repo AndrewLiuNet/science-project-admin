@@ -4,8 +4,21 @@
     
     <div class="tools">
       <div>
-        <span>请选择年份进行筛选：</span>
-          <el-select
+        <span>请选择时间：</span>
+         <el-date-picker
+          style="width:250px"
+            v-model="timeArea"
+            type="daterange"
+            align="right"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerAreaOptions"
+            @change="changeTime"
+            :append-to-body="false"
+             unlink-panels>
+            </el-date-picker>
+          <!-- <el-select
             v-model="value"
             placeholder="请选择年份"
             @change="searchYear"
@@ -16,7 +29,7 @@
             :label="item.yearName"
             :value="item.yearId"
           />
-        </el-select>
+        </el-select> -->
         
       </div>
 <!-- 
@@ -123,6 +136,7 @@ export default {
   name: "Comprehensive2",
   data() {
     return {
+      timeArea:"",
       total: 0,
       queryId: null,
       queryList: {
@@ -130,7 +144,9 @@ export default {
         rows: 10,
         yearId: "",
         searchStr: "",
-        attrOrginId: ""
+        attrOrginId: "",
+        beginTime:"",
+        endTime:""
       },
       yearOptions: [], // 年份下拉列表值
       attrOrginOptions: [], // 单位下拉列表值
@@ -168,6 +184,33 @@ export default {
           },
         ],
       },
+       pickerAreaOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
     };
   },
   mounted() {
@@ -176,6 +219,17 @@ export default {
     this.attrOrginGetList();
   },
   methods: {
+      changeTime(){
+       if(this.timeArea){
+           this.queryList.beginTime=this.timeArea[0];
+           this.queryList.endTime=this.timeArea[1];
+       }else{
+           this.queryList.beginTime=''
+           this.queryList.endTime=''
+       }
+       
+        this.getResearList();
+      },
     // 获取项目结项列表
     getResearList() {
       researchProjectsStatistical(this.queryList).then((res) => {

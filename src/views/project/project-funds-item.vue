@@ -3,8 +3,21 @@
     <!-- 科研项目立项汇总页面 -->
     <div class="tools">
       <div>
-        <span>请选择年份进行筛选：</span>
-        <el-select
+        <span>请选择时间：</span>
+         <el-date-picker
+          style="width:250px"
+            v-model="timeArea"
+            type="daterange"
+            align="right"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerAreaOptions"
+            @change="changeTime"
+            :append-to-body="false"
+             unlink-panels>
+            </el-date-picker>
+        <!-- <el-select
           v-model="value"
           placeholder="请选择年份"
           @change="searchYear"
@@ -15,19 +28,10 @@
             :label="item.yearName"
             :value="item.yearId"
           />
-        </el-select>
+        </el-select> -->
       </div>
       <div class="tools-btn">
-        <!-- <el-input
-          class="search-name"
-          v-model="queryList.searchStr"
-          placeholder="请根据名称查询"
-        ></el-input>
-        <el-button type="success" plain @click="searchList">查询</el-button> -->
-        <!-- <el-button type="success" plain @click="addDialogVisible = true"
-          >添 加</el-button
-        > -->
-        <!-- <el-button type="danger" plain>删 除</el-button> -->
+
       </div>
     </div>
     <!-- 页面加载的表格 -->
@@ -101,6 +105,7 @@ export default {
   name: "researchManpower",
   data() {
     return {
+      timeArea:'',
       total: 0,
       queryId: null,
       queryList: {
@@ -108,6 +113,8 @@ export default {
         rows: 10,
         yearId: "",
         searchStr: "",
+        beginTime:"",
+        endTime:""
       },
       yearOptions: [], // 年份下拉列表值
       attrOrginOptions: [], // 单位下拉列表值
@@ -145,6 +152,33 @@ export default {
           },
         ],
       },
+        pickerAreaOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
     };
   },
   mounted() {
@@ -153,11 +187,20 @@ export default {
     this.attrOrginGetList();
   },
   methods: {
+    changeTime(){
+       if(this.timeArea){
+           this.queryList.beginTime=this.timeArea[0];
+           this.queryList.endTime=this.timeArea[1];
+       }else{
+           this.queryList.beginTime=''
+           this.queryList.endTime=''
+       }
+       
+        this.getResearList();
+      },
     // 获取项目结项列表
     getResearList() {
       researchFunds(this.queryList).then((res) => {
-          console.log("====123123123");
-        console.log(res.data.list);
         let newArr=[];
         for(let i=0;i<res.data.list.length;i++){
            let obj={}
@@ -165,19 +208,7 @@ export default {
                 for(let p=0;p<res.data.list[0].fundsList.length;p++){
                      obj[p+'funds']=res.data.list[i].fundsList[p].fund
                 }
-                // res.data.list[i].fundsList.forEach(item => {
-                 
-                //   obj['twofunds']=item.fund,
-                //   obj['threefunds']=item.fund,
-                //   obj['fourfunds']=item.fund,
-                //   obj['fivefunds']=item.fund,
-                //   obj['sixfunds']=item.fund,
-                //   obj['sevenfunds']=item.fund,
-                //   obj['eightfunds']=item.fund,
-                //   obj['niethfunds']=item.fund,
-                //   obj['tenfunds']=item.fund
-                //  })
-   
+
          newArr.push(obj);
         // console.log("=====");
         // console.log(newArr);

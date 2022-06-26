@@ -18,12 +18,12 @@
         </el-select>
       </div>
       <div class="tools-btn">
-        <el-input
+        <!-- <el-input
           class="search-name"
           v-model="queryList.searchStr"
           placeholder="请根据名称查询"
         ></el-input>
-        <el-button type="success" plain @click="searchList">查询</el-button>
+        <el-button type="success" plain @click="searchList">查询</el-button> -->
         <el-button type="success" plain @click="addDialogVisible = true"
           >添 加</el-button
         >
@@ -32,7 +32,7 @@
       <!-- 添加模态框 -->
       <el-dialog title="添加" :visible.sync="addDialogVisible" width="50%">
         <el-form
-          ref="ruleForm"
+          ref="addForm"
           :rules="rules"
           :model="addForm"
           label-width="100px"
@@ -52,7 +52,7 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="选择年份" prop="yearId">
+          <el-form-item  label="选择年份" prop="yearId">
             <el-select
               class="inner-input"
               v-model="addForm.yearId"
@@ -67,42 +67,43 @@
             </el-select>
           </el-form-item>
           <el-form-item label="现有教员" prop="numberOfExistingTeachers">
-            <el-input v-model="addForm.numberOfExistingTeachers" />
+            <el-input-number v-model="addForm.numberOfExistingTeachers" placeholder="请输入现有教员"/>
           </el-form-item>
           <el-form-item label="投入人力" prop="research_Manpower_Y">
-            <el-input v-model="addForm.research_Manpower_Y" />
+            <el-input-number v-model="addForm.research_Manpower_Y" placeholder="请输入投入人力"/>
           </el-form-item>
           <el-form-item label="总数" prop="higher_Education_A">
-            <el-input v-model="addForm.higher_Education_A" />
+            <el-input-number v-model="addForm.higher_Education_A" placeholder="请输入总数"/>
           </el-form-item>
           <el-form-item label="领导" prop="higher_Leaders_B">
-            <el-input v-model="addForm.higher_Leaders_B" />
+            <el-input-number v-model="addForm.higher_Leaders_B" placeholder="请输入领导"/>
           </el-form-item>
           <el-form-item label="初职及以下" prop="beginningandbelow_D">
-            <el-input v-model="addForm.beginningandbelow_D" />
+            <el-input-number v-model="addForm.beginningandbelow_D" placeholder="请输入初职及以下"/>
           </el-form-item>
           <el-form-item label="博士生" prop="doctoral_Student_E">
-            <el-input v-model="addForm.doctoral_Student_E" />
+            <el-input-number v-model="addForm.doctoral_Student_E" placeholder="请输入博士生"/>
           </el-form-item>
           <el-form-item label="中职" prop="secondary_C">
-            <el-input v-model="addForm.secondary_C" />
+            <el-input-number v-model="addForm.secondary_C"  placeholder="请输入中职"/>
           </el-form-item>
           <el-form-item label="硕士生" prop="master_F">
-            <el-input v-model="addForm.master_F" />
+            <el-input-number v-model="addForm.master_F"  placeholder="请输入硕士生"/>
           </el-form-item>
           <el-form-item label="总课时" prop="total_class_Hours_G">
-            <el-input v-model="addForm.total_class_Hours_G" />
+            <el-input-number  v-model="addForm.total_class_Hours_G" placeholder="请输入总课时" />
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button @click="cancel('addForm')">取 消</el-button>
           <el-button type="primary" @click="addFormSub">确 定</el-button>
         </span>
       </el-dialog>
+
       <!-- 修改模态框  -->
       <el-dialog title="修改" :visible.sync="editDialogVisible" width="50%">
         <el-form
-          ref="ruleForm"
+          ref="eidtForm"
           :rules="rules"
           :model="eidtForm"
           label-width="100px"
@@ -129,31 +130,31 @@
             </el-select>
           </el-form-item>
           <el-form-item label="现有教员" prop="numberOfExistingTeachers">
-            <el-input v-model="eidtForm.numberOfExistingTeachers" />
+            <el-input-number v-model="eidtForm.numberOfExistingTeachers" />
           </el-form-item>
           <el-form-item label="投入人力" prop="research_Manpower_Y">
-            <el-input v-model="eidtForm.research_Manpower_Y" />
+            <el-input-number v-model="eidtForm.research_Manpower_Y" />
           </el-form-item>
           <el-form-item label="总数" prop="higher_Education_A">
-            <el-input v-model="eidtForm.higher_Education_A" />
+            <el-input-number v-model="eidtForm.higher_Education_A" />
           </el-form-item>
           <el-form-item label="领导" prop="higher_Leaders_B">
-            <el-input v-model="eidtForm.higher_Leaders_B" />
+            <el-input-number v-model="eidtForm.higher_Leaders_B" />
           </el-form-item>
           <el-form-item label="初职及以下" prop="beginningandbelow_D">
-            <el-input v-model="eidtForm.beginningandbelow_D" />
+            <el-input-number v-model="eidtForm.beginningandbelow_D" />
           </el-form-item>
           <el-form-item label="博士生" prop="doctoral_Student_E">
-            <el-input v-model="eidtForm.doctoral_Student_E" />
+            <el-input-number v-model="eidtForm.doctoral_Student_E" />
           </el-form-item>
           <el-form-item label="中职" prop="secondary_C">
-            <el-input v-model="eidtForm.secondary_C" />
+            <el-input-number v-model="eidtForm.secondary_C" />
           </el-form-item>
           <el-form-item label="硕士生" prop="master_F">
-            <el-input v-model="eidtForm.master_F" />
+            <el-input-number v-model="eidtForm.master_F" />
           </el-form-item>
           <el-form-item label="总课时" prop="total_class_Hours_G">
-            <el-input v-model="eidtForm.total_class_Hours_G" />
+            <el-input-number v-model="eidtForm.total_class_Hours_G" />
           </el-form-item>
 
           <!-- <el-form-item label="立项日期" prop="createTime">
@@ -167,7 +168,7 @@
           </el-form-item> -->
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取 消</el-button>
+          <el-button @click="cancel('eidtForm')">取 消</el-button>
           <el-button type="primary" @click="edtiFormSub">确 定</el-button>
         </span>
       </el-dialog>
@@ -184,7 +185,7 @@
         <el-table-column prop="secondary_C" label="中职" align="center"/>
         <el-table-column prop="beginningandbelow_D" label="初职及以下" align="center"/>
         <el-table-column prop="doctoral_Student_E" label="博士生" align="center"/>
-        <el-table-column prop="master_F" label="硕士生"align="center"/>
+        <el-table-column prop="master_F" label="硕士生" align="center"/>
         <el-table-column prop="total_class_Hours_G" label="总课时" align="center"/>
         <el-table-column width="220" label="操作" align="center">
           <template slot-scope="scope">
@@ -335,6 +336,14 @@ export default {
     this.attrOrginGetList();
   },
   methods: {
+    cancel(formName){
+        if(formName==='addForm'){
+          this.addDialogVisible=false;
+        }else{
+           this.editDialogVisible=false;
+        }
+        this.$refs[formName].clearValidate();
+    },
     // 获取项目结项列表
     getResearList() {
       researchManpower(this.queryList).then((res) => {
@@ -365,8 +374,9 @@ export default {
     },
     // 添加项目立项表单
     addFormSub() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.addForm.validate((valid) => {
         if (valid) {
+          this.addForm.createTime=new Date()
           addResearchManpower(this.addForm).then((res) => {
             // console.log(res);
             this.$message.success(res.msg);
@@ -380,28 +390,20 @@ export default {
     },
     // 编辑项目立项表单 前查询
     editRowInfo(row) {
-      console.log(row);
-      //   for (let i = 0; i < this.projectLevel.length; i++) {
-      //     if (row.projectLevelName === this.projectLevel[i].levelName) {
-      //       row.projectLevelId = this.projectLevel[i].levelId;
-      //     }
-      //   }
-      //   for (let i = 0; i < this.projectTypeList.length; i++) {
-      //     if (row.projectTypeName == this.projectTypeList[i].typeName) {
-      //       row.projectTypeId = this.projectTypeList[i].projectTypeId;
-      //     }
-      //   }
       this.eidtForm = { ...row };
       this.editDialogVisible = true;
     },
     // 编辑项目立项表单提交
     edtiFormSub() {
-      editResearchManpower(this.eidtForm).then((res) => {
-        console.log(res);
-        this.getResearList();
-        this.$message.success("修改成功！");
-        this.editDialogVisible = false;
-      });
+      this.$refs.eidtForm.validate(validate=>{
+        if(!validate)return;
+          editResearchManpower(this.eidtForm).then((res) => {
+          this.getResearList();
+          this.$message.success("修改成功！");
+          this.editDialogVisible = false;
+        });
+      })
+    
     },
     // 删除单行数据
     async delRowInfo(id) {
@@ -475,12 +477,12 @@ export default {
 }
 
 .addForm {
-  padding: 0 40px;
+  padding: 0 15px;
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  .el-input {
+  .el-input,.el-input-number,.el-select {
     width: 240px;
   }
 }

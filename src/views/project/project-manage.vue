@@ -33,7 +33,7 @@
       <!-- 添加模态框 -->
       <el-dialog title="添加" :visible.sync="addDialogVisible" width="30%">
         <el-form
-          ref="ruleForm"
+          ref="addForm"
           :rules="rules"
           :model="addForm"
           label-width="100px"
@@ -44,14 +44,14 @@
           </el-form-item>
          </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="cancel">取 消</el-button>
+          <el-button @click="cancel('addForm')">取 消</el-button>
           <el-button type="primary" @click="addFormSub">确 定</el-button>
         </span>
       </el-dialog>
       <!-- 修改模态框  -->
       <el-dialog title="修改" :visible.sync="editDialogVisible" width="30%">
         <el-form
-          ref="ruleForm"
+          ref="eidtForm"
           :rules="rules"
           :model="eidtForm"
           label-width="100px"
@@ -109,7 +109,7 @@
           </el-form-item> -->
         </el-form>
         <span slot="footer" class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取 消</el-button>
+          <el-button @click="cancel('eidtForm')">取 消</el-button>
           <el-button type="primary" @click="edtiFormSub">确 定</el-button>
         </span>
       </el-dialog>
@@ -235,10 +235,14 @@ export default {
     this.attrOrginGetList();
   },
   methods: {
-        cancel(){
-         this.addForm={};
-        this.addDialogVisible = false;
-   
+     cancel(formName){
+       if(formName==='addForm'){
+             this.addDialogVisible = false;
+       }else{
+            this.editDialogVisible=false;
+       }
+      
+       this.$refs[formName].clearValidate()
   },
     // 获取项目结项列表
     getResearList() {
@@ -271,13 +275,11 @@ export default {
     },
     // 添加项目立项表单
     addFormSub() {
-      this.$refs.ruleForm.validate((valid) => {
+      this.$refs.addForm.validate((valid) => {
         if (valid) {
           addProjectType(this.addForm).then((res) => {
-            // console.log(res);
-         
             this.$message.success(res.msg);
-              this.addForm={};
+            this.addForm={};
             this.addDialogVisible = false;
             this.getResearList();
           });
@@ -288,28 +290,21 @@ export default {
     },
     // 编辑项目立项表单 前查询
     editRowInfo(row) {
-      console.log(row);
-      //   for (let i = 0; i < this.projectLevel.length; i++) {
-      //     if (row.projectLevelName === this.projectLevel[i].levelName) {
-      //       row.projectLevelId = this.projectLevel[i].levelId;
-      //     }
-      //   }
-      //   for (let i = 0; i < this.projectTypeList.length; i++) {
-      //     if (row.projectTypeName == this.projectTypeList[i].typeName) {
-      //       row.projectTypeId = this.projectTypeList[i].projectTypeId;
-      //     }
-      //   }
-      this.eidtForm = { ...row };
+    
       this.editDialogVisible = true;
+        this.eidtForm = {...row};
     },
     // 编辑项目立项表单提交
     edtiFormSub() {
-      EditProjectType(this.eidtForm).then((res) => {
-        console.log(res);
-        this.getResearList();
-        this.$message.success("修改成功！");
-        this.editDialogVisible = false;
-      });
+      this.$refs.eidtForm.validate(valid=>{
+        if(!valid) return;
+         EditProjectType(this.eidtForm).then((res) => {
+          this.getResearList();
+          this.$message.success("修改成功！");
+          this.editDialogVisible = false;
+        });
+      })
+     
     },
     // 删除单行数据
     async delRowInfo(id) {

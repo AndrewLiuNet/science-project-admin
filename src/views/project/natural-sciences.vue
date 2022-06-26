@@ -29,7 +29,7 @@
             :picker-options="pickerAreaOptions"
             @change="changeTime"
             :append-to-body="false"
-            unlink-panels>
+             unlink-panels>
             </el-date-picker>
       </div>
         <el-input
@@ -37,6 +37,8 @@
           class="search-name"
           v-model="queryList.searchStr"
           placeholder="请根据名称查询"
+          clearable
+          @clear="getResearList"
         ></el-input>
         <el-button type="success" plain @click="searchList">查询</el-button>
         <el-button type="success" plain @click="addDialogVisible = true"
@@ -110,17 +112,17 @@
             </el-select>
           </el-form-item>
           <el-form-item label="项目名称" prop="project_name">
-            <el-input v-model="addForm.project_name" placeholder="请输入项目名称"/>
+            <el-input v-model="addForm.project_name" placeholder="请输入项目名称" clearable/>
           </el-form-item>
           <el-form-item label="负责人" prop="person_in_charge">
-            <el-input v-model="addForm.person_in_charge"  placeholder="请输入负责人"/>
+            <el-input v-model="addForm.person_in_charge"  placeholder="请输入负责人" clearable/>
           </el-form-item>
           <el-form-item label="总经费" prop="total_funds">
-            <el-input v-model="addForm.total_funds" placeholder="请输入总经费"/>
+            <el-input v-model.number="addForm.total_funds" placeholder="请输入总经费" clearable/>
           </el-form-item>
 
            <el-form-item label="编号" prop="code">
-            <el-input v-model="addForm.code" placeholder="请输入编号"/>
+            <el-input v-model="addForm.code" placeholder="请输入编号" clearable/>
           </el-form-item>
           
            <el-form-item label="是否加密" prop="isEncrypt">
@@ -199,7 +201,7 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="是否结题" prop="isFinish">
+          <el-form-item label="是否结题" prop="isFinish" >
             <el-select
               class="inner-input"
               v-model="eidtForm.isFinish"
@@ -214,16 +216,16 @@
             </el-select>
           </el-form-item>
           <el-form-item label="项目名称" prop="project_name">
-            <el-input v-model="eidtForm.project_name" placeholder="请输入项目名称"/>
+            <el-input v-model="eidtForm.project_name" placeholder="请输入项目名称" clearable/>
           </el-form-item>
           <el-form-item label="负责人" prop="person_in_charge">
-            <el-input v-model="eidtForm.person_in_charge" placeholder="请输入负责人"/>
+            <el-input v-model="eidtForm.person_in_charge" placeholder="请输入负责人" clearable/>
           </el-form-item>
           <el-form-item label="总经费" prop="total_funds">
-            <el-input v-model="eidtForm.total_funds" placeholder="请输入总经费"/>
+            <el-input v-model="eidtForm.total_funds" placeholder="请输入总经费" clearable/>
           </el-form-item>
             <el-form-item label="编号" prop="code">
-            <el-input v-model="eidtForm.code" placeholder="请输入编号"/>
+            <el-input v-model="eidtForm.code" placeholder="请输入编号" clearable/>
           </el-form-item>
           
            <el-form-item label="是否加密" prop="isEncrypt">
@@ -249,7 +251,7 @@
             label="合作单位"
             prop="cooperation_AttrOrgin"
           >
-            <el-input v-model="eidtForm.cooperation_AttrOrgin" />
+            <el-input v-model="eidtForm.cooperation_AttrOrgin"  clearable/>
           </el-form-item>
 
 
@@ -448,7 +450,8 @@ export default {
           { required: true, message: "请输入负责人", trigger: "blur" },
         ],
         total_funds: [
-          { required: true, message: "请输入总经费", trigger: "blur" },
+          { required: true, message: "请输入总经费", trigger: "change" },
+          { type:'number', message: '总经费必须为数字值'}
         ],
         price: [
           {
@@ -493,14 +496,13 @@ export default {
   },
   methods: {
     cancel(formName){
-      console.log(formName)
+
       if(formName==='addForm'){
         this.addDialogVisible=false;
-        this.$refs[formName].resetFields();
       }else{
          this.editDialogVisible=false;
-         this.$refs[formName].resetFields();
       }
+        this.$refs[formName].clearValidate();
     },
     changeFile(file) {
       let loading = this.$loading({
@@ -526,7 +528,6 @@ export default {
       this.isSuccess = true;
     },
      changeTime(){
-       console.log('变了')
        if(this.timeArea){
            this.queryList.beginTime=this.timeArea[0];
            this.queryList.endTime=this.timeArea[1];
@@ -596,6 +597,7 @@ export default {
           addResearchProject(this.addForm).then((res) => {
             this.$message.success(res.msg);
             this.addDialogVisible = false;
+            this.$refs['addForm'].resetFields()
             // this.getProjectTypeList();
             this.getResearList();
           });

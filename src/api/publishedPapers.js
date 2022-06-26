@@ -168,6 +168,13 @@ export function softwareCopyrightDel(data) {
   })
 }
 
+export function getAwardTypes(data){
+  return request({
+    url:'/api/yb1_Awardtype/GetList',
+    method:'post',
+    data
+  })
+}
 
 export function importzhuanli(data){
   return request({
@@ -190,6 +197,7 @@ export function importSoftWare(data){
 		  }
   })
 }
+
 
 
 

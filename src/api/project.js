@@ -86,6 +86,13 @@ export function attrOrginGetList(data) {
     data
   })
 }
+export function attrOriginById(data){
+  return request({
+    url:'/api/yb1_AttrOrgin/Get',
+    method:'post',
+    data
+  })
+}
 
 //查询各系科研人力 
 export function researchManpower(data) {

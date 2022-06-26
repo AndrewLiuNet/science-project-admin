@@ -60,9 +60,12 @@ export default {
     logout() {
       console.log("清除cookit");
       // this.$cookies.remove("science_project_admin_token");
-      Cookies.remove("science_project_admin_token");
+      // Cookies.remove("science_project_admin_token");/
+      // this.$store.dispatch('user/logout')
+      localStorage.removeItem('token')
+      localStorage.removeItem('name')
       this.$router.push("/login");
-      // await this.$store.dispatch('user/logout')
+      // await 
       // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     },
   },

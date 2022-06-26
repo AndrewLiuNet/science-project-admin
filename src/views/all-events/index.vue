@@ -2,34 +2,33 @@
   <div class="approve">
     <!-- 科研项目立项汇总页面 -->
     <div class="tools">
-      <div>
-        <!-- <span>请选择年份进行筛选：</span>
-        <el-select
-          v-model="value"
-          placeholder="请选择年份"
-          @change="searchYear"
-        >
-          <el-option
-            v-for="item in yearOptions"
-            :key="item.yearId"
-            :label="item.yearName"
-            :value="item.yearId"
-          />
-        </el-select> -->
-      </div>
-      <div class="tools-btn">
+        <div>
+          <span>请选择时间:</span>
+           <el-date-picker
+           style="width:250px;margin-left:10px;"
+            v-model="timeArea"
+            type="daterange"
+            align="right"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :picker-options="pickerAreaOptions"
+            @change="changeTime"
+            :append-to-body="false"
+             unlink-panels>
+            </el-date-picker>
         <el-input
+          style="margin-left:10px;"
           class="search-name"
-          v-model="queryList.name"
-          placeholder="请根据标题查询"
+          v-model="queryList.searchStr"
+          placeholder="请输入标题"
+          clearable
+          @clear="getResearList"
         ></el-input>
         <el-button type="success" plain @click="searchList">查询</el-button>
         <el-button type="success" plain @click="addDialogVisibleBtn"
-          >添 加</el-button
-        >
-        <!-- <el-button type="danger" plain>删 除</el-button> -->
-      </div>
-      <!-- 添加模态框 -->
+          >添 加</el-button>
+        </div>
       <el-dialog
         title="添加"
         :visible.sync="addDialogVisible"
@@ -43,10 +42,15 @@
           label-width="100px"
           class="addForm"
         >
+        <el-row>
+          <el-col :span="12">
           <el-form-item label="标题" prop="memTitle">
-            <el-input v-model="addForm.memTitle" />
+            <el-input v-model="addForm.memTitle" placeholder="请输入标题"/>
           </el-form-item>
+          </el-col>
+            <el-col :span="12">
           <el-form-item label="时间" prop="memTime">
+             <!-- value-format="YYYY-MM-DD HH:mm:ss" -->
             <el-date-picker
               v-model="addForm.memTime"
               type="datetime"
@@ -56,18 +60,31 @@
               :picker-options="pickerOptions"
             />
           </el-form-item>
-          <!-- <el-form-item label="选择年份" prop="yearId">
-            <el-select v-model="addForm.yearId" placeholder="请选择年份">
-              <el-option
-                v-for="item in yearOptions"
-                :key="item.yearId"
-                :label="item.yaerName"
-                :value="item.yearId"
-              />
-            </el-select>
-
-          </el-form-item> -->
-          <el-form-item label="内容" prop="memContent">
+             </el-col>
+        </el-row>
+         <el-row>
+           <el-col :span="12">
+              <el-form-item label="年份" prop="yearId">
+                  <el-select v-model="addForm.yearId" placeholder="请选择年份">
+                    <el-option v-for="(item,index) in yearOptions"
+                    :key="index"
+                    :value="item.yearId"
+                    :label="item.yearName"></el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+             <el-col :span="12">
+              <el-form-item label="单位" prop="attrOrginId">
+                <el-select v-model="addForm.attrOrginId" placeholder="请选择单位">
+                  <el-option v-for="(item,index) in attrOrigin" 
+                  :key="index"
+                  :label="item.attrOrginName"
+                  :value="item.id"></el-option>
+                </el-select>
+            </el-form-item>
+           </el-col>
+     </el-row>
+             <el-form-item label="内容" prop="memContent">
             <div id="demo1" ref="edirRef"></div>
           </el-form-item>
         </el-form>
@@ -76,6 +93,7 @@
           <el-button type="primary" @click="addFormSub">确 定</el-button>
         </span>
       </el-dialog>
+
       <!-- 修改模态框  -->
       <el-dialog
         title="修改"
@@ -88,10 +106,15 @@
           :rules="rules"
           :model="eidtForm"
           label-width="100px"
+          class="addForm"
         >
+               <el-row>
+          <el-col :span="12">
           <el-form-item label="标题" prop="memTitle">
-            <el-input v-model="eidtForm.memTitle" />
+            <el-input v-model="eidtForm.memTitle" placeholder="请输入标题"/>
           </el-form-item>
+          </el-col>
+            <el-col :span="12">
           <el-form-item label="时间" prop="memTime">
             <el-date-picker
               v-model="eidtForm.memTime"
@@ -102,6 +125,30 @@
               :picker-options="pickerOptions"
             />
           </el-form-item>
+             </el-col>
+        </el-row>
+         <el-row>
+           <el-col :span="12">
+              <el-form-item label="年份" prop="yearId">
+                  <el-select v-model="eidtForm.yearId" placeholder="请选择年份">
+                    <el-option v-for="(item,index) in yearOptions"
+                    :key="index"
+                    :value="item.yearId"
+                    :label="item.yearName"></el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+             <el-col :span="12">
+                <el-form-item label="单位" prop="attrOrginId">
+                  <el-select v-model="eidtForm.attrOrginId" placeholder="请选择单位">
+                    <el-option v-for="(item,index) in attrOrigin" 
+                    :key="index"
+                    :label="item.attrOrginName"
+                    :value="item.id"></el-option>
+                  </el-select>
+              </el-form-item>
+           </el-col>
+     </el-row>
           <el-form-item label="内容" prop="memContent">
             <div id="demo2" ref="edirRef2"></div>
           </el-form-item>
@@ -112,12 +159,15 @@
         </span>
       </el-dialog>
     </div>
+
     <!-- 页面加载的表格 -->
     <el-card class="data">
       <el-table :data="tableData" stripe style="width: 100%">
-        <el-table-column type="index" label="序号" width="220" align="center"/>
-        <el-table-column prop="memTitle" label="标题" align="center"/>
-        <el-table-column prop="memTime" label="时间" width="320" align="center"/>
+        <el-table-column type="index" label="序号" min-width="16%" align="center"/>
+        <el-table-column prop="memTitle" label="标题" min-width="16%" align="center"/>
+        <el-table-column prop="memTime" label="时间" min-width="16%" align="center"/>
+         <el-table-column prop="attrOrginId" :formatter="getAttr" label="单位" min-width="16%" align="center"/>
+          <el-table-column prop="yearId" :formatter="getYear" label="年份" min-width="16%" align="center"/>
         <el-table-column width="220" label="操作" align="center">
           <template slot-scope="scope">
             <el-link
@@ -147,24 +197,29 @@
         @current-change="handleCurrentChange"
       />
     </el-card>
+
   </div>
 </template>
 
 <script>
 import { getMems, deleteMems, addMems, editMems } from "@/api/allEvents";
 import { getYears } from "@/api/getYears";
+import { attrOrginGetList,attrOriginById } from '@/api/project'
 import wangEditor from "wangeditor";
 export default {
   name: "AllEvents",
   data() {
     return {
+      timeArea:"",
       total: 0,
       queryId: null,
       queryList: {
         page: 1,
         rows: 10,
         yearId: "",
-        name: "",
+        searchStr: "",
+        beginTime:"",
+        endTime:""
       },
       yearOptions: [], // 年份下拉列表值
       projectTypeList: [], // 年份下拉列表值
@@ -178,6 +233,8 @@ export default {
         memTime: null, // 时间
         yearId: null, //年份
         memContent: null, // 内容
+        yearId:'',
+        attrOrginId:''
       },
       eidtForm: {},
       // 时间控件的值
@@ -213,15 +270,69 @@ export default {
         memTime: [{ required: true, message: "请选择时间", trigger: "change" }],
         yearId: [{ required: true, message: "请选择年份", trigger: "change" }],
       },
+         // 时间控件的值
+        pickerAreaOptions: {
+          shortcuts: [{
+            text: '最近一周',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近一个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              picker.$emit('pick', [start, end]);
+            }
+          }, {
+            text: '最近三个月',
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              picker.$emit('pick', [start, end]);
+            }
+          }]
+        },
+        attrOrigin:[]
     };
   },
   mounted() {
     this.getResearList();
     this.getYearsListData();
-    this.getProjectTypesListData();
-    this.getProjectLevelsListData();
+    this.initAttr();
   },
   methods: {
+
+    initAttr(){
+      let params={
+          "page": 1,
+          "rows": 100,
+          "yearId": "",
+          "searchStr": "",
+          "attrOrginId": "",
+          "beginTime": "",
+          "endTime": ""
+        }
+      attrOrginGetList(params).then(res=>{
+         console.log(res)
+          this.attrOrigin=res.data.list
+      })
+    },
+    changeTime(){
+       if(this.timeArea){
+           this.queryList.beginTime=this.timeArea[0];
+           this.queryList.endTime=this.timeArea[1];
+       }else{
+           this.queryList.beginTime=''
+           this.queryList.endTime=''
+       }
+        this.getResearList();
+    },
     //打开添加模态框，创建富文本
     addDialogVisibleBtn() {
       this.addDialogVisible = true;
@@ -289,20 +400,6 @@ export default {
       // console.log(e);
       this.queryList.yearId = e;
       this.getResearList();
-    },
-    // 获取项目立项类型
-    getProjectTypesListData() {
-      // getProjectTypeListData().then((res) => {
-      //   // console.log(res);
-      //   this.projectTypeList = res.data
-      // })
-    },
-    // 获取项目立项级别
-    getProjectLevelsListData() {
-      // getProjectLevelListData().then((res) => {
-      //   console.log(res)
-      //   this.projectLevel = res.data
-      // })
     },
     // 添加项目立项表单
     addFormSub() {
@@ -439,6 +536,23 @@ export default {
     searchList() {
       this.getResearList();
     },
+    getAttr(row){
+      if(row.attrOrginId){
+       let attr= this.attrOrigin.find(e=>{
+         return e.id===row.attrOrginId
+       })
+       return attr?.attrOrginName
+      }
+    },
+    getYear(row){
+      if(row.yearId){
+        let year=this.yearOptions.find(e=>{
+          return e.yearId===row.yearId
+        })
+        return year?.yearName
+      }
+    },
+
   },
 };
 </script>
@@ -466,8 +580,8 @@ export default {
   margin: 20px 0 0 0;
 }
 .addForm {
-  .el-input {
-    width: 45%;
+  .el-input,.el-select {
+    width: 85%;
   }
 }
 .search-name {
