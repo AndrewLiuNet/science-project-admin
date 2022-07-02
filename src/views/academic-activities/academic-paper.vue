@@ -82,8 +82,15 @@
           <el-form-item label="发表刊物" prop="publication">
             <el-input  v-model="addForm.publication" placeholder="请输入发表刊物"/>
           </el-form-item>
-          <el-form-item label="收录情况" prop="collection">
-            <el-input v-model="addForm.collection" placeholder="请输入收录情况"/>
+          <el-form-item label="论文类型" prop="collection">
+              <el-select v-model="addForm.collection" placeholder="请输入论文类型">
+                <el-option v-for="item in collectionList"
+                 :key="item"
+                 :label="item"
+                 :value="item">
+                </el-option>
+              </el-select>
+           
           </el-form-item>
           <!-- <el-form-item label="论文编号" prop="code">
             <el-input v-model="addForm.code" placeholder="请输入论文编号"/>
@@ -145,8 +152,15 @@
           <el-form-item label="发表刊物" prop="publication">
             <el-input v-model="eidtForm.publication" />
           </el-form-item>
-          <el-form-item label="收录情况" prop="collection">
-            <el-input v-model="eidtForm.collection" />
+          <el-form-item label="论文类型" prop="collection">
+            <el-select v-model="eidtForm.collection" placeholder="请输入论文类型">
+                <el-option v-for="item in collectionList"
+                 :key="item"
+                 :label="item"
+                 :value="item">
+                </el-option>
+              </el-select>
+            <!-- <el-input v-model=".collection" /> -->
           </el-form-item>
            <!-- <el-form-item label="论文编号" prop="code">
             <el-input v-model="eidtForm.code" placeholder="请输入论文编号"/>
@@ -168,7 +182,7 @@
         <el-table-column prop="attrOrginName" label="单位" align="center"/>
         <el-table-column prop="publication" label="发表刊物" align="center"/>
         <el-table-column prop="publication_time" label="发表时间" align="center"/>
-        <el-table-column prop="collection" label="收录情况" align="center"/>
+        <el-table-column prop="collection" label="论文类型" align="center"/>
           <!-- <el-table-column prop="code" label="论文编号" align="center"/> -->
     
         <el-table-column width="220" label="操作">
@@ -211,6 +225,9 @@ export default {
   name: "AcademicPaper",
   data() {
     return {
+      collectionList:[
+        'SCI','EI','军事学核心','中文核心','未收录'
+      ],
         // 时间控件的值
         pickerAreaOptions: {
           shortcuts: [{
@@ -321,7 +338,7 @@ export default {
         ],
         publication: [{ required: true, message: "请输入发表刊物", trigger: "blur" }],
         collection: [
-          { required: true, message: "请输入收录情况", trigger: "blur" },
+          { required: true, message: "请输入论文类型", trigger: "blur" },
         ],
         code:[
           {required:true,message:'请输入论文编号',trigger:'blur'}
