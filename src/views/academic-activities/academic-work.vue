@@ -51,7 +51,7 @@
         </el-upload>
          <div>
         <el-button   style="margin-left:10px;" type="primary" plain>  <a
-          href="/static/学术著作.xlsx" download>下载模板</a></el-button>
+          href="/static/Upload_Academic_work学术著作.xlsx" download>下载模板</a></el-button>
           </div>
 
  

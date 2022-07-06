@@ -144,10 +144,23 @@
       </el-row>
 
       <el-row>
+        <!-- patent_time -->
            <el-col :span="12">
-            <el-form-item label="专利号" prop="patent_number">
-              <el-input v-model="addForm.patent_number"   placeholder="请输入专利号"/>
-            </el-form-item>
+              <el-form-item label="专利号" prop="patent_number">
+                <el-input v-model="addForm.patent_number"   placeholder="请输入专利号"/>
+              </el-form-item>
+            </el-col>
+             <el-col :span="12">
+              <el-form-item label="专利时间" prop="patent_time">
+                 <el-date-picker
+                          v-model="addForm.patent_time"
+                          type="datetime"
+                          placeholder="请选择专利时间"
+                          align="right"
+                          :picker-options="pickerOptions">
+                        </el-date-picker>
+                <!-- <el-input v-model="addForm.patent_time"   placeholder="请输入专利时间"/> -->
+              </el-form-item>
             </el-col>
       </el-row>
       </el-form>
@@ -261,8 +274,19 @@
                   <el-input v-model="eidtForm.patent_number" placeholder="请输入专利号"/>
                 </el-form-item>
             </el-col>
-        
-    
+              <el-col :span="12">
+                  <el-form-item label="专利时间" prop="patent_time">
+                         <el-date-picker
+                          v-model="eidtForm.patent_time"
+                          type="datetime"
+                          placeholder="请选择专利时间"
+                          align="right"
+                          :picker-options="pickerOptions">
+                        </el-date-picker>
+                    <!-- <el-input v-model="eidtForm.patent_time"   placeholder="请输入专利时间"/> -->
+                  </el-form-item>
+                </el-col>
+
           </el-row>
          
      
@@ -331,6 +355,7 @@ export default {
   name: "reportAndpublished",
   data() {
     return {
+           timeArea:"",
         isSuccess:false,
       fileList:[],
       tableData: [],
@@ -357,7 +382,8 @@ export default {
         inventor: null, //发明人
         patent_number: null, //专利号
         isApplication: null, //授权or申请
-        yearId: null, // 年份
+        yearId: null, // 年份 
+        patent_time:null,
         // publication_time: null, // 日期
       },
       isApplicationOption: [
@@ -422,6 +448,7 @@ export default {
         createTime: [
           { required: true, message: "请选择项目创建时间", trigger: "change" },
         ],
+        patent_time:[{ required: true, message: "请选择专利时间", trigger: "change" }],
       },
     };
   },
@@ -432,6 +459,18 @@ export default {
     this.getResearList();
   },
   methods: {
+    //  changeTime(){
+    //    if(this.timeArea){
+    //        this.queryList.beginTime=this.timeArea[0];
+    //        this.queryList.endTime=this.timeArea[1];
+    //    }else{
+    //        this.queryList.beginTime=''
+    //        this.queryList.endTime=''
+    //    }
+       
+    //     this.getResearList();
+    //   },
+      
       cancel(formName){
         if(formName==='addForm'){
             this.addDialogVisible=false;
